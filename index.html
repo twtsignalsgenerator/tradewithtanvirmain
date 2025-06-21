@@ -1,4 +1,4 @@
-<!-- TWT Signal Generator: Compact & Responsive -->
+
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -126,7 +126,11 @@
 </head>
 <body>
   <div class="card">
-    <h2>TWT SIGNAL GANARATOR</h2>
+    <h2>TWT SIGNAL GENERATOR</h2>
+
+    <p style="text-align:center">
+      📅 <span id="current-date"></span> ⏰ <span id="current-time"></span>
+    </p>
 
     <h3>Available Assets:</h3>
     <select id="asset-select">
@@ -141,15 +145,6 @@
       <option value="ALL">All</option>
       <option value="CALL">CALL</option>
       <option value="PUT">PUT</option>
-    </select>
-
-    <h3>Select Strategy:</h3>
-    <select id="strategy-select">
-      <option value="rsi_ma">RSI + MA50</option>
-      <option value="macd">MACD</option>
-      <option value="bollinger">Bollinger Bands</option>
-      <option value="stochastic">Stochastic Oscillator</option>
-      <option value="combined">All Strategies Combined</option>
     </select>
 
     <h3>Backtest Filter:</h3>
@@ -173,105 +168,104 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script>
-    const availableAssets = [
-            "USDNGN-OTC", "USDCOP-OTC", "USDTRY-OTC", "USDZAR-OTC", "USDARS-OTC",
-            "USDPKR-OTC", "USDBDT-OTC", "CADCHF-OTC", "USDJPY-OTC", "USDPHP-OTC",
-            "USDMXN-OTC", "USDINR-OTC", "USDEGP-OTC", "USDDZD-OTC", "USD/BRL-OTC",
-            "JNJ-OTC", "BA-OTC", "PFE-OTC", "MSFT-OTC", "USCRUDE-OTC",
-            "UKBRENT-OTC", "FB-OTC", "MCD-OTC", "EURUSD", "GBPUSD",
-            "USDJPY", " AUDUSD", "USDCAD", "USD/JPY", "EURGBP",
-            "EURJPY", "GBPJPY", "AUDJPY", "EURCHF", "Bitcoin-OTC",
-            "Gold-OTC", "Silver-OTC"
-        ];
+      const availableAssets = [
+    "USDNGN-OTC", "USDCOP-OTC", "USDTRY-OTC", "USDZAR-OTC", "USDARS-OTC",
+    "USDPKR-OTC", "USDBDT-OTC", "CADCHF-OTC", "USDJPY-OTC", "USDPHP-OTC",
+    "USDMXN-OTC", "USDINR-OTC", "USDEGP-OTC", "USDDZD-OTC", "USD/BRL-OTC",
+    "JNJ-OTC", "BA-OTC", "PFE-OTC", "MSFT-OTC", "USCRUDE-OTC",
+    "UKBRENT-OTC", "FB-OTC", "MCD-OTC", "EURUSD", "GBPUSD",
+    "USDJPY", "AUDUSD", "USDCAD", "USD/JPY", "EURGBP",
+    "EURJPY", "GBPJPY", "AUDJPY", "EURCHF", "Bitcoin-OTC",
+    "Gold-OTC", "Silver-OTC"
+	];
 
-        let signals = [];
-        let existingSignals = new Set();
 
-        function formatTime(date) {
-            return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    let signals = [];
+    let existingSignals = new Set();
+
+    function formatTime(date) {
+      return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function generateSignal(asset, time) {
+      const direction = Math.random() < 0.5 ? 'CALL' : 'PUT';
+      return { asset, time, direction };
+    }
+
+    function generateUniqueTimes(count) {
+      const times = [];
+      let nextTime = new Date();
+      for (let i = 0; i < count; i++) {
+        nextTime.setMinutes(nextTime.getMinutes() + 5);
+        times.push(formatTime(nextTime));
+      }
+      return times;
+    }
+
+    function handleGenerateSignals() {
+      const generateBtn = document.getElementById('generate-signals');
+      const selectedAsset = document.getElementById('asset-select').value;
+      const signalCount = Number(document.getElementById('signal-count').value);
+      const errorMessage = document.getElementById('error-message');
+      const filter = document.getElementById('filter-select').value;
+      const isBacktest = document.getElementById('backtest-filter').checked;
+
+      generateBtn.textContent = 'Generating...';
+
+      setTimeout(() => {
+        generateBtn.textContent = 'Generate';
+
+        if (!selectedAsset) {
+          errorMessage.textContent = 'Please select an asset!';
+          return;
         }
 
-        function generateSignal(asset, time) {
-            const direction = Math.random() < 0.5 ? 'CALL' : 'PUT';
-            return { asset, time, direction };
-        }
+        errorMessage.textContent = '';
+        const uniqueTimes = generateUniqueTimes(signalCount);
+        const newSignals = [];
 
-        function generateUniqueTimes(count) {
-            const times = [];
-            let nextTime = new Date();
-            for (let i = 0; i < count; i++) {
-                nextTime.setMinutes(nextTime.getMinutes() + 5);
-                times.push(formatTime(nextTime));
-            }
-            return times;
-        }
+        uniqueTimes.forEach(time => {
+          const signalKey = `${selectedAsset}-${time}`;
+          if (!existingSignals.has(signalKey)) {
+            let signal = generateSignal(selectedAsset, time);
 
-        function handleGenerateSignals() {
-            const copySignalsButton = document.getElementById('copy-signals');
-            const selectedAsset = document.getElementById('asset-select').value;
-            const signalCount = Number(document.getElementById('signal-count').value);
-            const errorMessage = document.getElementById('error-message');
+            // Backtest 97% filter
+            if (isBacktest && Math.random() > 0.97) return;
 
-            copySignalsButton.style.display = 'inline-block';
+            // Filter CALL/PUT
+            if (filter !== "ALL" && signal.direction !== filter) return;
 
+            newSignals.push(signal);
+            existingSignals.add(signalKey);
+          }
+        });
 
-            
-            if (!selectedAsset) {
-                errorMessage.textContent = 'Please select an asset before generating signals!';
-                return;
-            }
+        signals = newSignals;
+        displaySignals(newSignals);
+        showAnimation();
+      }, 1000);
+    }
 
-            errorMessage.textContent = '';
-            const uniqueTimes = generateUniqueTimes(signalCount);
-            const newSignals = [];
+    function displaySignals(newSignals) {
+      const list = document.getElementById('signal-list');
+      list.innerHTML = '';
+      newSignals.forEach(signal => {
+        const li = document.createElement('li');
+        li.textContent = `${signal.asset} ➪ ${signal.time} - ${signal.direction}`;
+        list.appendChild(li);
+      });
+      document.getElementById('copy-signals').style.display = 'inline-block';
+      window.generatedSignals = newSignals;
+    }
 
-            uniqueTimes.forEach((time) => {
-                const signalKey = `${selectedAsset} ; ${time}`;
-                if (!existingSignals.has(signalKey)) {
-                    const newSignal = generateSignal(selectedAsset, time);
-                    newSignals.push(newSignal);
-                    existingSignals.add(signalKey);
-                }
-            });
-
-            signals.push(...newSignals);
-            displaySignals(newSignals);
-            showAnimation();
-        }
-
-     // Function to display generated signals
-function displaySignals(newSignals) {
-    const signalList = document.getElementById('signal-list');
-    signalList.innerHTML = ""; // Clear the existing list
-
-    newSignals.forEach(signal => {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${signal.asset} ➪ ${signal.time} - ${signal.direction}`;
-        signalList.appendChild(listItem);
-    });
-
-    // Show the "Copy Signals" button
-    const copySignalsButton = document.getElementById('copy-signals');
-    copySignalsButton.style.display = 'inline-block';
-
-    // Store the signals globally for copying
-    window.generatedSignals = newSignals;
-}
-
-// Function to handle "Copy Signals" button click
-document.getElementById('copy-signals').addEventListener('click', () => {
-    // Get today's date
-    const today = new Date();
-    const formattedDate = `${today.getDate()}|${today.getMonth() + 1}|${today.getFullYear()}`;
-
-    // Prepare the signals format
-    const signalsText = window.generatedSignals.map(signal => 
+    document.getElementById('copy-signals').addEventListener('click', () => {
+      const today = new Date();
+      const formattedDate = `${today.getDate()}|${today.getMonth() + 1}|${today.getFullYear()}`;
+      const signalsText = window.generatedSignals.map(signal =>
         `❒ ${signal.asset} ➪ ${signal.time} - ${signal.direction}`
-    ).join('\n');
-
-    // Full formatted text
-    const fullFormat = `
-     🕸 TWT FUTURE SIGNALS 🕸    
+      ).join('\n');
+      const finalText = `
+🕸 TWT FUTURE SIGNALS 🕸    
 
 🌐UTC +06:00 (DHAKA,BANGLADESH)
 ⚙️MTG +1 STEP
@@ -279,55 +273,45 @@ document.getElementById('copy-signals').addEventListener('click', () => {
 
 1 Minute:-
 
-
 ${signalsText}
 
 ⛔️ AVOIDE SIGNAL AFTER BIG CANDLE, DOJI, BELOW 80% & GAP 🚫
 `;
-
-    // Copy the full format to the clipboard
-    navigator.clipboard.writeText(fullFormat)
+      navigator.clipboard.writeText(finalText)
         .then(() => toastr.success("Signals copied to clipboard!"))
-        .catch(err => toastr.error("Failed to copy the signals", err));
-});
+        .catch(err => toastr.error("Failed to copy signals"));
+    });
 
+    function showAnimation() {
+      const anim = document.getElementById('animation-message');
+      anim.style.display = 'block';
+      setTimeout(() => anim.style.display = 'none', 2000);
+    }
 
+    function handleResetSignals() {
+      signals = [];
+      existingSignals = new Set();
+      document.getElementById('signal-list').innerHTML = '';
+      document.getElementById('copy-signals').style.display = 'none';
+    }
 
-        function showAnimation() {
-            const animationMessage = document.getElementById('animation-message');
-            animationMessage.style.display = 'block';
-            setTimeout(() => {
-                animationMessage.style.display = 'none';
-            }, 2000);
-        }
+    function updateDateTime() {
+      const now = new Date();
+      document.getElementById('current-date').textContent = now.toLocaleDateString();
+      document.getElementById('current-time').textContent = now.toLocaleTimeString('en-GB');
+    }
 
-        function handleResetSignals() {
-            signals = [];
-            existingSignals = new Set();
-            document.getElementById('signal-list').innerHTML = '';
-        }
+    // Initialize
+    availableAssets.forEach(asset => {
+      const opt = document.createElement('option');
+      opt.value = asset;
+      opt.textContent = asset;
+      document.getElementById('asset-select').appendChild(opt);
+    });
 
-        function updateDateTime() {
-            const currentDate = new Date();
-            document.getElementById('current-date').textContent = currentDate.toLocaleDateString();
-            document.getElementById('current-time').textContent = currentDate.toLocaleTimeString('en-GB');
-        }
-
-        // Populate the asset dropdown
-        const assetSelect = document.getElementById('asset-select');
-        availableAssets.forEach(asset => {
-            const option = document.createElement('option');
-            option.value = asset;
-            option.textContent = asset;
-            assetSelect.appendChild(option);
-        });
-
-        // Event listeners
-        document.getElementById('generate-signals').addEventListener('click', handleGenerateSignals);
-        document.getElementById('reset-signals').addEventListener('click', handleResetSignals);
-
-        // Update time every second
-        setInterval(updateDateTime, 1000);
-    </script>
+    document.getElementById('generate-signals').addEventListener('click', handleGenerateSignals);
+    document.getElementById('reset-signals').addEventListener('click', handleResetSignals);
+    setInterval(updateDateTime, 1000);
+  </script>
 </body>
 </html>
