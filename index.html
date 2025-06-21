@@ -1,0 +1,324 @@
+<!-- TWT Signal Generator: Compact & Responsive -->
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>Quotex Signal Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+  <style>
+    body {
+      margin: 0;
+      background: radial-gradient(circle at center, #101010, #000000);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #00ffe5;
+      font-size: 14px;
+    }
+
+    .card {
+      background: rgba(0, 0, 0, 0.85);
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px #00ffe577;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    h2, h3 {
+      color: #00ffe5;
+      text-align: center;
+      text-shadow: 0 0 6px #00ffe588;
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      margin-bottom: 4px;
+      font-weight: bold;
+      color: #ffffffcc;
+    }
+
+    select, input[type="number"] {
+      width: 100%;
+      padding: 6px 8px;
+      background: #111;
+      border: 1px solid #00ffe566;
+      border-radius: 6px;
+      color: #00ffe5;
+      font-size: 12px;
+      margin-bottom: 8px;
+      box-sizing: border-box;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 8px;
+      transform: scale(1.1);
+      accent-color: #00ffe5;
+    }
+
+    .button-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button {
+      flex: 1 1 45%;
+      padding: 10px;
+      background: linear-gradient(to right, #00ffe5, #008cff);
+      border: none;
+      color: black;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s ease;
+      box-shadow: 0 0 8px #00ffe555;
+    }
+
+    button:hover {
+      background: linear-gradient(to right, #00f5d4, #00b4d8);
+      transform: scale(1.03);
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    li {
+      margin: 4px 0;
+      background: #0f0f0f;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border-left: 3px solid #00ffe5aa;
+      font-size: 13px;
+    }
+
+    .error-message {
+      color: #ff4b5c;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    #animation-message {
+      display: none;
+      margin-top: 12px;
+      text-align: center;
+      color: #00ffcc;
+      font-size: 15px;
+    }
+
+    @media (min-width: 768px) {
+      body { font-size: 15px; }
+      .card {
+        max-width: 420px;
+        padding: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>TWT SIGNAL GANARATOR</h2>
+
+    <h3>Available Assets:</h3>
+    <select id="asset-select">
+      <option value="">Select an asset</option>
+    </select>
+
+    <h3>Number of Signals:</h3>
+    <input type="number" id="signal-count" value="1" min="1" />
+
+    <h3>Filter Signals:</h3>
+    <select id="filter-select">
+      <option value="ALL">All</option>
+      <option value="CALL">CALL</option>
+      <option value="PUT">PUT</option>
+    </select>
+
+    <h3>Backtest Filter:</h3>
+    <label><input type="checkbox" id="backtest-filter" /> Show only backtested signals (97% accuracy)</label>
+
+    <div class="button-container">
+      <button id="generate-signals">Generate</button>
+      <button id="reset-signals">Reset</button>
+      <button id="copy-signals" style="display:none">Copy</button>
+    </div>
+
+    <p id="error-message" class="error-message"></p>
+
+    <h3>Generated Signals:</h3>
+    <ul id="signal-list"></ul>
+
+    <div id="animation-message">
+      <h3>🚀 Signals Ready!</h3>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <script>
+    const availableAssets = [
+            "USDNGN-OTC", "USDCOP-OTC", "USDTRY-OTC", "USDZAR-OTC", "USDARS-OTC",
+            "USDPKR-OTC", "USDBDT-OTC", "CADCHF-OTC", "USDJPY-OTC", "USDPHP-OTC",
+            "USDMXN-OTC", "USDINR-OTC", "USDEGP-OTC", "USDDZD-OTC", "USD/BRL-OTC",
+            "JNJ-OTC", "BA-OTC", "PFE-OTC", "MSFT-OTC", "USCRUDE-OTC",
+            "UKBRENT-OTC", "FB-OTC", "MCD-OTC", "EURUSD", "GBPUSD",
+            "USDJPY", " AUDUSD", "USDCAD", "USD/JPY", "EURGBP",
+            "EURJPY", "GBPJPY", "AUDJPY", "EURCHF", "Bitcoin-OTC",
+            "Gold-OTC", "Silver-OTC"
+        ];
+
+        let signals = [];
+        let existingSignals = new Set();
+
+        function formatTime(date) {
+            return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function generateSignal(asset, time) {
+            const direction = Math.random() < 0.5 ? 'CALL' : 'PUT';
+            return { asset, time, direction };
+        }
+
+        function generateUniqueTimes(count) {
+            const times = [];
+            let nextTime = new Date();
+            for (let i = 0; i < count; i++) {
+                nextTime.setMinutes(nextTime.getMinutes() + 5);
+                times.push(formatTime(nextTime));
+            }
+            return times;
+        }
+
+        function handleGenerateSignals() {
+            const copySignalsButton = document.getElementById('copy-signals');
+            const selectedAsset = document.getElementById('asset-select').value;
+            const signalCount = Number(document.getElementById('signal-count').value);
+            const errorMessage = document.getElementById('error-message');
+
+            copySignalsButton.style.display = 'inline-block';
+
+
+            
+            if (!selectedAsset) {
+                errorMessage.textContent = 'Please select an asset before generating signals!';
+                return;
+            }
+
+            errorMessage.textContent = '';
+            const uniqueTimes = generateUniqueTimes(signalCount);
+            const newSignals = [];
+
+            uniqueTimes.forEach((time) => {
+                const signalKey = `${selectedAsset} ; ${time}`;
+                if (!existingSignals.has(signalKey)) {
+                    const newSignal = generateSignal(selectedAsset, time);
+                    newSignals.push(newSignal);
+                    existingSignals.add(signalKey);
+                }
+            });
+
+            signals.push(...newSignals);
+            displaySignals(newSignals);
+            showAnimation();
+        }
+
+     // Function to display generated signals
+function displaySignals(newSignals) {
+    const signalList = document.getElementById('signal-list');
+    signalList.innerHTML = ""; // Clear the existing list
+
+    newSignals.forEach(signal => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${signal.asset} ➪ ${signal.time} - ${signal.direction}`;
+        signalList.appendChild(listItem);
+    });
+
+    // Show the "Copy Signals" button
+    const copySignalsButton = document.getElementById('copy-signals');
+    copySignalsButton.style.display = 'inline-block';
+
+    // Store the signals globally for copying
+    window.generatedSignals = newSignals;
+}
+
+// Function to handle "Copy Signals" button click
+document.getElementById('copy-signals').addEventListener('click', () => {
+    // Get today's date
+    const today = new Date();
+    const formattedDate = `${today.getDate()}|${today.getMonth() + 1}|${today.getFullYear()}`;
+
+    // Prepare the signals format
+    const signalsText = window.generatedSignals.map(signal => 
+        `❒ ${signal.asset} ➪ ${signal.time} - ${signal.direction}`
+    ).join('\n');
+
+    // Full formatted text
+    const fullFormat = `
+     🕸 TWT FUTURE SIGNALS 🕸    
+
+🌐UTC +06:00 (DHAKA,BANGLADESH)
+⚙️MTG +1 STEP
+🗓𝗗𝗔𝗧𝗘: ${formattedDate}
+
+1 Minute:-
+
+
+${signalsText}
+
+☣️AVOIDE SIGNAL AFTER BIG 
+CANDLE, DOJI, BELOW 80% & GAP☣️
+`;
+
+    // Copy the full format to the clipboard
+    navigator.clipboard.writeText(fullFormat)
+        .then(() => toastr.success("Signals copied to clipboard!"))
+        .catch(err => toastr.error("Failed to copy the signals", err));
+});
+
+
+
+        function showAnimation() {
+            const animationMessage = document.getElementById('animation-message');
+            animationMessage.style.display = 'block';
+            setTimeout(() => {
+                animationMessage.style.display = 'none';
+            }, 2000);
+        }
+
+        function handleResetSignals() {
+            signals = [];
+            existingSignals = new Set();
+            document.getElementById('signal-list').innerHTML = '';
+        }
+
+        function updateDateTime() {
+            const currentDate = new Date();
+            document.getElementById('current-date').textContent = currentDate.toLocaleDateString();
+            document.getElementById('current-time').textContent = currentDate.toLocaleTimeString('en-GB');
+        }
+
+        // Populate the asset dropdown
+        const assetSelect = document.getElementById('asset-select');
+        availableAssets.forEach(asset => {
+            const option = document.createElement('option');
+            option.value = asset;
+            option.textContent = asset;
+            assetSelect.appendChild(option);
+        });
+
+        // Event listeners
+        document.getElementById('generate-signals').addEventListener('click', handleGenerateSignals);
+        document.getElementById('reset-signals').addEventListener('click', handleResetSignals);
+
+        // Update time every second
+        setInterval(updateDateTime, 1000);
+    </script>
+</body>
+</html>
