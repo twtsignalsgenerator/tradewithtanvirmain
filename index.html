@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Quotex Signal Generator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
   <link rel="icon" href="logo.png" type="image/png" />
-
   <style>
+    /* Your original styles are kept as-is */
     body {
       margin: 0;
       background: radial-gradient(circle at center, #101010, #000000);
@@ -130,7 +130,6 @@
       }
     }
 
-    /* Mobile responsiveness */
     @media (max-width: 480px) {
       body {
         font-size: 13px;
@@ -177,7 +176,7 @@
       <option value="ALL">All Strategies Combined</option>
     </select>
 
-    <h3>Filter Signals:</h3>
+    <h3>Signal Filter:</h3>
     <select id="filter-select">
       <option value="ALL">All</option>
       <option value="CALL">CALL</option>
@@ -185,10 +184,7 @@
     </select>
 
     <h3>Backtest Filter:</h3>
-    <label
-      ><input type="checkbox" id="backtest-filter" /> Show only backtested signals
-      (97% accuracy)</label
-    >
+    <label><input type="checkbox" id="backtest-filter" /> Show only backtested signals (97% accuracy)</label>
 
     <div class="button-container">
       <button id="generate-signals">Generate</button>
@@ -206,12 +202,10 @@
     </div>
   </div>
 
+  <!-- Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.11.1/tsparticles.bundle.min.js"></script>
-  <div
-    id="tsparticles"
-    style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;"
-  ></div>
+  <div id="tsparticles" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;"></div>
   <script>
     tsParticles.load('tsparticles', {
       background: { color: '#000' },
@@ -224,19 +218,15 @@
         move: { enable: true, speed: 1 },
       },
     });
-  </script>
 
-  <script>
-    // Block right click/context menu
     document.addEventListener('contextmenu', event => event.preventDefault());
 
-    // Block certain keyboard shortcuts (F12, Ctrl+Shift+I, Ctrl+U, Ctrl+S)
     document.addEventListener('keydown', function (e) {
       if (
         e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) || // Ctrl+Shift+I
-        (e.ctrlKey && (e.key === 'U' || e.key === 'u')) || // Ctrl+U
-        (e.ctrlKey && (e.key === 'S' || e.key === 's')) // Ctrl+S (save page)
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) ||
+        (e.ctrlKey && (e.key === 'U' || e.key === 'u')) ||
+        (e.ctrlKey && (e.key === 'S' || e.key === 's'))
       ) {
         e.preventDefault();
         alert('This action is disabled on this website.');
@@ -244,43 +234,13 @@
     });
 
     const availableAssets = [
-      'USDNGN-OTC',
-      'USDCOP-OTC',
-      'USDTRY-OTC',
-      'USDZAR-OTC',
-      'USDARS-OTC',
-      'USDPKR-OTC',
-      'USDBDT-OTC',
-      'CADCHF-OTC',
-      'USDJPY-OTC',
-      'USDPHP-OTC',
-      'USDMXN-OTC',
-      'USDINR-OTC',
-      'USDEGP-OTC',
-      'USDDZD-OTC',
-      'USD/BRL-OTC',
-      'JNJ-OTC',
-      'BA-OTC',
-      'PFE-OTC',
-      'MSFT-OTC',
-      'USCRUDE-OTC',
-      'UKBRENT-OTC',
-      'FB-OTC',
-      'MCD-OTC',
-      'EURUSD',
-      'GBPUSD',
-      'USDJPY',
-      'AUDUSD',
-      'USDCAD',
-      'USD/JPY',
-      'EURGBP',
-      'EURJPY',
-      'GBPJPY',
-      'AUDJPY',
-      'EURCHF',
-      'Bitcoin-OTC',
-      'Gold-OTC',
-      'Silver-OTC',
+      'USDNGN-OTC','USDCOP-OTC','USDTRY-OTC','NZDCAD-OTC','NZDZPY-OTC','USDZAR-OTC','USDARS-OTC',
+      'USDPKR-OTC','USDBDT-OTC','CADCHF-OTC','USDJPY-OTC','USDPHP-OTC',
+      'USDMXN-OTC','USDINR-OTC','USDEGP-OTC','USDDZD-OTC','USD/BRL-OTC',
+      'JNJ-OTC','BA-OTC','PFE-OTC','MSFT-OTC','USCRUDE-OTC','UKBRENT-OTC',
+      'FB-OTC','MCD-OTC','EURUSD','GBPUSD','USDJPY','AUDUSD','USDCAD',
+      'USD/JPY','EURGBP','EURJPY','GBPJPY','AUDJPY','EURCHF','Bitcoin-OTC',
+      'Gold-OTC','Silver-OTC'
     ];
 
     let signals = [];
@@ -295,12 +255,13 @@
       return { asset, time, direction };
     }
 
-    function generateUniqueTimes(count) {
+    function generateUniqueTimes(count, minGap, maxGap) {
       const times = [];
       let nextTime = new Date();
       for (let i = 0; i < count; i++) {
-        nextTime.setMinutes(nextTime.getMinutes() + 5);
-        times.push(formatTime(nextTime));
+        const gap = Math.floor(Math.random() * (maxGap - minGap + 1)) + minGap;
+        nextTime.setMinutes(nextTime.getMinutes() + gap);
+        times.push(formatTime(new Date(nextTime)));
       }
       return times;
     }
@@ -331,7 +292,9 @@
           selectedStrategy = strategies[Math.floor(Math.random() * strategies.length)];
         }
 
-        const uniqueTimes = generateUniqueTimes(signalCount);
+        const minGap = isBacktest ? 7 : 4;
+        const maxGap = isBacktest ? 10 : 7;
+        const uniqueTimes = generateUniqueTimes(signalCount, minGap, maxGap);
         const newSignals = [];
 
         uniqueTimes.forEach((time) => {
@@ -340,7 +303,6 @@
             let signal = generateSignal(selectedAsset, time);
 
             if (isBacktest && Math.random() > 0.97) return;
-
             if (filter !== 'ALL' && signal.direction !== filter) return;
 
             newSignals.push(signal);
@@ -375,15 +337,15 @@
       const finalText = `
 🕸 TWT FUTURE SIGNALS 🕸    
 
-🌐UTC +06:00 (DHAKA,BANGLADESH)
+🌐UTC +06:00 (DHAKA, BANGLADESH)
 ⚙️MTG +1 STEP
-🗓𝗗𝗔𝗧𝗘: ${formattedDate}
+🗓DATE: ${formattedDate}
 
 1 Minute:-
 
 ${signalsText}
 
-⛔️ AVOIDE SIGNAL AFTER BIG CANDLE, DOJI, BELOW 80% & GAP 🚫
+⛔️ AVOID SIGNAL AFTER BIG CANDLE, DOJI, BELOW 80% & GAP 🚫
 `;
       navigator.clipboard
         .writeText(finalText)
@@ -410,7 +372,6 @@ ${signalsText}
       document.getElementById('current-time').textContent = now.toLocaleTimeString('en-GB');
     }
 
-    // Initialize assets dropdown
     availableAssets.forEach((asset) => {
       const opt = document.createElement('option');
       opt.value = asset;
