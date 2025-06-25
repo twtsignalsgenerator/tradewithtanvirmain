@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
   <link rel="icon" href="logo.png" type="image/png" />
   <style>
-    /* Your original styles are kept as-is */
     body {
       margin: 0;
       background: radial-gradient(circle at center, #101010, #000000);
@@ -21,7 +20,6 @@
       padding: 10px;
       box-sizing: border-box;
     }
-
     .card {
       background: rgba(0, 0, 0, 0.85);
       padding: 24px;
@@ -31,7 +29,6 @@
       max-width: 360px;
       box-sizing: border-box;
     }
-
     h2,
     h3 {
       color: #00ffe5;
@@ -39,7 +36,6 @@
       text-shadow: 0 0 6px #00ffe588;
       margin-bottom: 10px;
     }
-
     label {
       display: block;
       margin-top: 12px;
@@ -47,7 +43,6 @@
       font-weight: bold;
       color: #ffffffcc;
     }
-
     select,
     input[type='number'] {
       width: 100%;
@@ -60,20 +55,17 @@
       margin-bottom: 8px;
       box-sizing: border-box;
     }
-
     input[type='checkbox'] {
       margin-right: 8px;
       transform: scale(1.1);
       accent-color: #00ffe5;
     }
-
     .button-container {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       margin-top: 12px;
     }
-
     button {
       flex: 1 1 45%;
       padding: 10px;
@@ -86,17 +78,14 @@
       transition: 0.3s ease;
       box-shadow: 0 0 8px #00ffe555;
     }
-
     button:hover {
       background: linear-gradient(to right, #00f5d4, #00b4d8);
       transform: scale(1.03);
     }
-
     ul {
       list-style: none;
       padding-left: 0;
     }
-
     li {
       margin: 4px 0;
       background: #0f0f0f;
@@ -105,13 +94,11 @@
       border-left: 3px solid #00ffe5aa;
       font-size: 13px;
     }
-
     .error-message {
       color: #ff4b5c;
       font-size: 13px;
       text-align: center;
     }
-
     #animation-message {
       display: none;
       margin-top: 12px;
@@ -119,7 +106,6 @@
       color: #00ffcc;
       font-size: 15px;
     }
-
     @media (min-width: 768px) {
       body {
         font-size: 15px;
@@ -129,7 +115,6 @@
         padding: 32px;
       }
     }
-
     @media (max-width: 480px) {
       body {
         font-size: 13px;
@@ -161,6 +146,7 @@
     <h3>Available Assets:</h3>
     <select id="asset-select">
       <option value="">Select an asset</option>
+      <option value="ALL_ASSETS">🌐 All Assets</option>
     </select>
 
     <h3>Number of Signals:</h3>
@@ -202,10 +188,11 @@
     </div>
   </div>
 
-  <!-- Scripts -->
+  <!-- JS Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.11.1/tsparticles.bundle.min.js"></script>
   <div id="tsparticles" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;"></div>
+
   <script>
     tsParticles.load('tsparticles', {
       background: { color: '#000' },
@@ -260,8 +247,8 @@
       let nextTime = new Date();
       for (let i = 0; i < count; i++) {
         const gap = Math.floor(Math.random() * (maxGap - minGap + 1)) + minGap;
-        nextTime.setMinutes(nextTime.getMinutes() + gap);
-        times.push(formatTime(new Date(nextTime)));
+        nextTime = new Date(nextTime.getTime() + gap * 60000);
+        times.push(formatTime(nextTime));
       }
       return times;
     }
@@ -294,20 +281,31 @@
 
         const minGap = isBacktest ? 7 : 4;
         const maxGap = isBacktest ? 10 : 7;
-        const uniqueTimes = generateUniqueTimes(signalCount, minGap, maxGap);
+
+        const assetsToUse = selectedAsset === 'ALL_ASSETS' ? availableAssets : [selectedAsset];
+
+        let totalSignals = signalCount;
+        let signalsPerAsset = assetsToUse.length > 0 ? Math.floor(totalSignals / assetsToUse.length) : 0;
+        let remainder = assetsToUse.length > 0 ? totalSignals % assetsToUse.length : 0;
+
         const newSignals = [];
 
-        uniqueTimes.forEach((time) => {
-          const signalKey = `${selectedAsset}-${time}`;
-          if (!existingSignals.has(signalKey)) {
-            let signal = generateSignal(selectedAsset, time);
+        assetsToUse.forEach((asset, index) => {
+          let countForThisAsset = signalsPerAsset + (index < remainder ? 1 : 0);
+          const uniqueTimes = generateUniqueTimes(countForThisAsset, minGap, maxGap);
 
-            if (isBacktest && Math.random() > 0.97) return;
-            if (filter !== 'ALL' && signal.direction !== filter) return;
+          uniqueTimes.forEach((time) => {
+            const signalKey = `${asset}-${time}`;
+            if (!existingSignals.has(signalKey)) {
+              const signal = generateSignal(asset, time);
 
-            newSignals.push(signal);
-            existingSignals.add(signalKey);
-          }
+              if (isBacktest && Math.random() > 0.97) return;
+              if (filter !== 'ALL' && signal.direction !== filter) return;
+
+              newSignals.push(signal);
+              existingSignals.add(signalKey);
+            }
+          });
         });
 
         signals = newSignals;
@@ -319,11 +317,20 @@
     function displaySignals(newSignals) {
       const list = document.getElementById('signal-list');
       list.innerHTML = '';
+
+      // সময় ক্রমানুসারে সাজানো
+      newSignals.sort((a, b) => {
+        const [aH, aM] = a.time.split(':').map(Number);
+        const [bH, bM] = b.time.split(':').map(Number);
+        return aH === bH ? aM - bM : aH - bH;
+      });
+
       newSignals.forEach((signal) => {
         const li = document.createElement('li');
         li.textContent = `${signal.asset} ➪ ${signal.time} - ${signal.direction}`;
         list.appendChild(li);
       });
+
       document.getElementById('copy-signals').style.display = 'inline-block';
       window.generatedSignals = newSignals;
     }
