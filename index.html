@@ -1,394 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Quotex Signal Generator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
-  <link rel="icon" href="logo.png" type="image/png" />
-  <style>
-    body {
-      margin: 0;
-      background: radial-gradient(circle at center, #101010, #000000);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      color: #00ffe5;
-      font-size: 14px;
-      padding: 10px;
-      box-sizing: border-box;
-    }
-    .card {
-      background: rgba(0, 0, 0, 0.85);
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px #00ffe577;
-      width: 100%;
-      max-width: 360px;
-      box-sizing: border-box;
-    }
-    h2,
-    h3 {
-      color: #00ffe5;
-      text-align: center;
-      text-shadow: 0 0 6px #00ffe588;
-      margin-bottom: 10px;
-    }
-    label {
-      display: block;
-      margin-top: 12px;
-      margin-bottom: 4px;
-      font-weight: bold;
-      color: #ffffffcc;
-    }
-    select,
-    input[type='number'] {
-      width: 100%;
-      padding: 6px 8px;
-      background: #111;
-      border: 1px solid #00ffe566;
-      border-radius: 6px;
-      color: #00ffe5;
-      font-size: 12px;
-      margin-bottom: 8px;
-      box-sizing: border-box;
-    }
-    input[type='checkbox'] {
-      margin-right: 8px;
-      transform: scale(1.1);
-      accent-color: #00ffe5;
-    }
-    .button-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 12px;
-    }
-    button {
-      flex: 1 1 45%;
-      padding: 10px;
-      background: linear-gradient(to right, #00ffe5, #008cff);
-      border: none;
-      color: black;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s ease;
-      box-shadow: 0 0 8px #00ffe555;
-    }
-    button:hover {
-      background: linear-gradient(to right, #00f5d4, #00b4d8);
-      transform: scale(1.03);
-    }
-    ul {
-      list-style: none;
-      padding-left: 0;
-    }
-    li {
-      margin: 4px 0;
-      background: #0f0f0f;
-      padding: 4px 8px;
-      border-radius: 4px;
-      border-left: 3px solid #00ffe5aa;
-      font-size: 13px;
-    }
-    .error-message {
-      color: #ff4b5c;
-      font-size: 13px;
-      text-align: center;
-    }
-    #animation-message {
-      display: none;
-      margin-top: 12px;
-      text-align: center;
-      color: #00ffcc;
-      font-size: 15px;
-    }
-    @media (min-width: 768px) {
-      body {
-        font-size: 15px;
-      }
-      .card {
-        max-width: 420px;
-        padding: 32px;
-      }
-    }
-    @media (max-width: 480px) {
-      body {
-        font-size: 13px;
-        padding: 8px;
-      }
-      .card {
-        padding: 16px;
-        max-width: 320px;
-      }
-      button {
-        flex: 1 1 100%;
-      }
-      select,
-      input[type='number'] {
-        font-size: 14px;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RED DRAGON AI- Login</title>
+<link rel="icon" href="logo.png" type="image/png" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+
+<style>
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f5f7ff;
+  padding: 10px;
+  box-sizing: border-box;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+.card {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
+  padding: 24px 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  width: 100%;
+  max-width: 360px;
+  min-width: 260px;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card h2 {
+  color: #004aad;
+  text-align: center;
+  margin-bottom: 18px;
+  letter-spacing: 0.5px;
+  font-size: 21px;
+}
+
+input[type='text'], input[type='password'] {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  border:1px solid rgba(0,0,0,0.1);
+  background: rgba(255,255,255,0.85);
+  color: #004aad;
+  font-size: 14px;
+  text-align: center;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+input[type='text']:focus, input[type='password']:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0,123,255,0.3);
+}
+
+button {
+  width: 100%;
+  padding: 12px 0;
+  background: linear-gradient(145deg,#007bff,#3399ff);
+  border:none;
+  color:white;
+  border-radius:12px;
+  font-weight:bold;
+  cursor:pointer;
+  transition: all 0.3s ease;
+  box-shadow:0 4px 15px rgba(0,0,0,0.1);
+  margin-top: 10px;
+  font-size: 15px;
+}
+
+button:hover { 
+  background:linear-gradient(145deg,#0069d9,#1a83ff); 
+  transform:scale(1.04); 
+}
+
+.error-message { 
+  color:#ff4b5c; 
+  font-size:13px; 
+  text-align:center; 
+  min-height:18px; 
+  margin-top:10px; 
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 20px 16px;
+    max-width: 300px;
+  }
+  .card h2 { font-size: 19px; }
+  input[type='text'], input[type='password'] { font-size: 13px; }
+  button { font-size: 14px; }
+}
+</style>
 </head>
-
 <body>
-  <div class="card">
-    <h2>TWT SIGNAL GENERATOR</h2>
 
-    <p style="text-align:center">
-      📅 <span id="current-date"></span> ⏰ <span id="current-time"></span>
-    </p>
+<div class="card">
+  <h2>RED DRAGON AI</h2>
+  <form onsubmit="return loginUser(event)">
+    <input type="text" id="username" placeholder="USERNAME" required />
+    <input type="password" id="password" placeholder="PASSWORD" required />
+    <button type="submit" id="loginBtn">LOGIN</button>
+    <p id="error-msg" class="error-message"></p>
+  </form>
+</div>
 
-    <h3>Available Assets:</h3>
-    <select id="asset-select">
-      <option value="">Select an asset</option>
-      <option value="ALL_ASSETS">🌐 All Assets</option>
-    </select>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script>
+function loginUser(event) {
+  event.preventDefault();
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const errorMsg = document.getElementById("error-msg");
+  
+  if(username === "TRADERTANVIR07" && password === "TWTVIP") {
+    errorMsg.textContent = "";
+    toastr.success('Login successful!');
+    setTimeout(()=> window.location.href="https://twtsignalsgenerator.github.io/tradewithtanvirmain/", 500);
+  } else {
+    errorMsg.textContent = "Invalid credentials!";
+    toastr.error('Invalid credentials!');
+  }
+}
 
-    <h3>Number of Signals:</h3>
-    <input type="number" id="signal-count" value="1" min="1" />
+document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
 
-    <h3>Select Strategy:</h3>
-    <select id="strategy-select">
-      <option value="RANDOM" selected>Random (Default)</option>
-      <option value="RSI">RSI + MA50</option>
-      <option value="MACD">MACD</option>
-      <option value="BBANDS">Bollinger Bands</option>
-      <option value="STOCH">Stochastic Oscillator</option>
-      <option value="ALL">All Strategies Combined</option>
-    </select>
-
-    <h3>Signal Filter:</h3>
-    <select id="filter-select">
-      <option value="ALL">All</option>
-      <option value="CALL">CALL</option>
-      <option value="PUT">PUT</option>
-    </select>
-
-    <h3>Backtest Filter:</h3>
-    <label><input type="checkbox" id="backtest-filter" /> Show only backtested signals (97% accuracy)</label>
-
-    <div class="button-container">
-      <button id="generate-signals">Generate</button>
-      <button id="reset-signals">Reset</button>
-      <button id="copy-signals" style="display:none">Copy</button>
-    </div>
-
-    <p id="error-message" class="error-message"></p>
-
-    <h3>Generated Signals:</h3>
-    <ul id="signal-list"></ul>
-
-    <div id="animation-message">
-      <h3>🚀 Signals Ready!</h3>
-    </div>
-  </div>
-
-  <!-- JS Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.11.1/tsparticles.bundle.min.js"></script>
-  <div id="tsparticles" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;"></div>
-
-  <script>
-    tsParticles.load('tsparticles', {
-      background: { color: '#000' },
-      particles: {
-        number: { value: 40 },
-        color: { value: '#00ffe5' },
-        shape: { type: 'circle' },
-        opacity: { value: 0.5 },
-        size: { value: 2 },
-        move: { enable: true, speed: 1 },
-      },
-    });
-
-    document.addEventListener('contextmenu', event => event.preventDefault());
-
-    document.addEventListener('keydown', function (e) {
-      if (
-        e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) ||
-        (e.ctrlKey && (e.key === 'U' || e.key === 'u')) ||
-        (e.ctrlKey && (e.key === 'S' || e.key === 's'))
-      ) {
-        e.preventDefault();
-        alert('This action is disabled on this website.');
-      }
-    });
-
-    const availableAssets = [
-      'USDNGN-OTC','USDCOP-OTC','USDTRY-OTC','NZDCAD-OTC','NZDZPY-OTC','USDZAR-OTC','USDARS-OTC',
-      'USDPKR-OTC','USDBDT-OTC','CADCHF-OTC','USDJPY-OTC','USDPHP-OTC',
-      'USDMXN-OTC','USDINR-OTC','USDEGP-OTC','USDDZD-OTC','USD/BRL-OTC',
-      'JNJ-OTC','BA-OTC','PFE-OTC','MSFT-OTC','USCRUDE-OTC','UKBRENT-OTC',
-      'FB-OTC','MCD-OTC','EURUSD','GBPUSD','USDJPY','AUDUSD','USDCAD',
-      'USD/JPY','EURGBP','EURJPY','GBPJPY','AUDJPY','EURCHF','Bitcoin-OTC',
-      'Gold-OTC','Silver-OTC'
-    ];
-
-    let signals = [];
-    let existingSignals = new Set();
-
-    function formatTime(date) {
-      return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-    }
-
-    function generateSignal(asset, time) {
-      const direction = Math.random() < 0.5 ? 'CALL' : 'PUT';
-      return { asset, time, direction };
-    }
-
-    function generateUniqueTimes(count, minGap, maxGap) {
-      const times = [];
-      let nextTime = new Date();
-      for (let i = 0; i < count; i++) {
-        const gap = Math.floor(Math.random() * (maxGap - minGap + 1)) + minGap;
-        nextTime = new Date(nextTime.getTime() + gap * 60000);
-        times.push(formatTime(nextTime));
-      }
-      return times;
-    }
-
-    function handleGenerateSignals() {
-      const generateBtn = document.getElementById('generate-signals');
-      const selectedAsset = document.getElementById('asset-select').value;
-      const signalCount = Number(document.getElementById('signal-count').value);
-      const errorMessage = document.getElementById('error-message');
-      const filter = document.getElementById('filter-select').value;
-      const isBacktest = document.getElementById('backtest-filter').checked;
-      let selectedStrategy = document.getElementById('strategy-select').value;
-
-      generateBtn.textContent = 'Generating...';
-
-      setTimeout(() => {
-        generateBtn.textContent = 'Generate';
-
-        if (!selectedAsset) {
-          errorMessage.textContent = 'Please select an asset!';
-          return;
-        }
-
-        errorMessage.textContent = '';
-
-        if (selectedStrategy === 'RANDOM') {
-          const strategies = ['RSI', 'MACD', 'BBANDS', 'STOCH', 'ALL'];
-          selectedStrategy = strategies[Math.floor(Math.random() * strategies.length)];
-        }
-
-        const minGap = isBacktest ? 7 : 4;
-        const maxGap = isBacktest ? 10 : 7;
-
-        const assetsToUse = selectedAsset === 'ALL_ASSETS' ? availableAssets : [selectedAsset];
-
-        let totalSignals = signalCount;
-        let signalsPerAsset = assetsToUse.length > 0 ? Math.floor(totalSignals / assetsToUse.length) : 0;
-        let remainder = assetsToUse.length > 0 ? totalSignals % assetsToUse.length : 0;
-
-        const newSignals = [];
-
-        assetsToUse.forEach((asset, index) => {
-          let countForThisAsset = signalsPerAsset + (index < remainder ? 1 : 0);
-          const uniqueTimes = generateUniqueTimes(countForThisAsset, minGap, maxGap);
-
-          uniqueTimes.forEach((time) => {
-            const signalKey = `${asset}-${time}`;
-            if (!existingSignals.has(signalKey)) {
-              const signal = generateSignal(asset, time);
-
-              if (isBacktest && Math.random() > 0.97) return;
-              if (filter !== 'ALL' && signal.direction !== filter) return;
-
-              newSignals.push(signal);
-              existingSignals.add(signalKey);
-            }
-          });
-        });
-
-        signals = newSignals;
-        displaySignals(newSignals);
-        showAnimation();
-      }, 1000);
-    }
-
-    function displaySignals(newSignals) {
-      const list = document.getElementById('signal-list');
-      list.innerHTML = '';
-
-      // সময় ক্রমানুসারে সাজানো
-      newSignals.sort((a, b) => {
-        const [aH, aM] = a.time.split(':').map(Number);
-        const [bH, bM] = b.time.split(':').map(Number);
-        return aH === bH ? aM - bM : aH - bH;
-      });
-
-      newSignals.forEach((signal) => {
-        const li = document.createElement('li');
-        li.textContent = `${signal.asset} ➪ ${signal.time} - ${signal.direction}`;
-        list.appendChild(li);
-      });
-
-      document.getElementById('copy-signals').style.display = 'inline-block';
-      window.generatedSignals = newSignals;
-    }
-
-    document.getElementById('copy-signals').addEventListener('click', () => {
-      const today = new Date();
-      const formattedDate = `${today.getDate()}|${today.getMonth() + 1}|${today.getFullYear()}`;
-      const signalsText = window.generatedSignals
-        .map((signal) => `❒ ${signal.asset} ➪ ${signal.time} - ${signal.direction}`)
-        .join('\n');
-      const finalText = `
-🕸 TWT FUTURE SIGNALS 🕸    
-
-🌐UTC +06:00 (DHAKA, BANGLADESH)
-⚙️MTG +1 STEP
-🗓DATE: ${formattedDate}
-
-1 Minute:-
-
-${signalsText}
-
-⛔️ AVOID SIGNAL AFTER BIG CANDLE, DOJI, BELOW 80% & GAP 🚫
-`;
-      navigator.clipboard
-        .writeText(finalText)
-        .then(() => toastr.success('Signals copied to clipboard!'))
-        .catch(() => toastr.error('Failed to copy signals'));
-    });
-
-    function showAnimation() {
-      const anim = document.getElementById('animation-message');
-      anim.style.display = 'block';
-      setTimeout(() => (anim.style.display = 'none'), 2000);
-    }
-
-    function handleResetSignals() {
-      signals = [];
-      existingSignals = new Set();
-      document.getElementById('signal-list').innerHTML = '';
-      document.getElementById('copy-signals').style.display = 'none';
-    }
-
-    function updateDateTime() {
-      const now = new Date();
-      document.getElementById('current-date').textContent = now.toLocaleDateString();
-      document.getElementById('current-time').textContent = now.toLocaleTimeString('en-GB');
-    }
-
-    availableAssets.forEach((asset) => {
-      const opt = document.createElement('option');
-      opt.value = asset;
-      opt.textContent = asset;
-      document.getElementById('asset-select').appendChild(opt);
-    });
-
-    document.getElementById('generate-signals').addEventListener('click', handleGenerateSignals);
-    document.getElementById('reset-signals').addEventListener('click', handleResetSignals);
-    setInterval(updateDateTime, 1000);
-  </script>
 </body>
 </html>
