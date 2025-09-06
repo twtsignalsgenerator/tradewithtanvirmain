@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>TWT SIGNAL GENERATOR</title>
+<title>RED DRAGON AI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
 <link rel="icon" href="logo.png" type="image/png" />
@@ -55,7 +55,7 @@ li { margin:6px 0; padding:6px 10px; border-radius:8px; font-size:13px; color:#0
 </head>
 <body>
 <div class="card">
-<h2>TWT SIGNAL GENERATOR</h2>
+<h2>🛡️ RED DRAGON AI 🛡️</h2>
 <p style="text-align:center; color:#004aad">📅 <span id="current-date"></span> ⏰ <span id="current-time"></span></p>
 
 <h3>Available Assets:</h3>
@@ -105,6 +105,9 @@ let signals = [];
 function formatTime(date){ return date.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}); }
 function generateSignal(asset,time){ const direction = Math.random()<0.5?'CALL':'PUT'; return {asset,time,direction}; }
 
+// Shuffle function
+function shuffle(array){ return array.sort(()=>Math.random()-0.5); }
+
 function handleGenerateSignals(){
   const generateBtn=document.getElementById('generate-signals');
   const selectedAsset=document.getElementById('asset-select').value;
@@ -127,24 +130,29 @@ function handleGenerateSignals(){
     if(filter !== 'ALL') baseProbability *= 0.7;
 
     if(selectedAsset === 'ALL_ASSETS'){
-      const assetCount = availableAssets.length;
-      const signalsPerAsset = Math.floor(totalSignals / assetCount);
-      const remainder = totalSignals % assetCount;
+      // Shuffle করে ভিন্ন ভিন্ন অ্যাসেট বাছাই
+      const shuffledAssets = shuffle([...availableAssets]);
+      const chosenAssets = shuffledAssets.slice(0, totalSignals);
 
-      availableAssets.forEach((asset, idx) => {
-        let numSignals = signalsPerAsset + (idx < remainder ? 1 : 0);
-        for(let i=0;i<numSignals;i++){
-          let attempt=0;
-          while(attempt<20){
-            attempt++;
-            const timeStr=formatTime(currentTime);
-            const sig=generateSignal(asset,timeStr);
-            if(filter!=='ALL' && sig.direction!==filter){ currentTime=new Date(currentTime.getTime()+1*60000); continue; }
-            if(Math.random()>baseProbability){ currentTime=new Date(currentTime.getTime()+1*60000); continue; }
-            newSignals.push(sig);
-            currentTime=new Date(currentTime.getTime()+8*60000);
-            break;
+      chosenAssets.forEach(asset=>{
+        let attempt=0;
+        while(attempt<20){
+          attempt++;
+          const timeStr=formatTime(currentTime);
+          const sig=generateSignal(asset,timeStr);
+
+          if(filter!=='ALL' && sig.direction!==filter){ 
+            currentTime=new Date(currentTime.getTime()+1*60000); 
+            continue; 
           }
+          if(Math.random()>baseProbability){ 
+            currentTime=new Date(currentTime.getTime()+1*60000); 
+            continue; 
+          }
+
+          newSignals.push(sig);
+          currentTime=new Date(currentTime.getTime()+8*60000);
+          break;
         }
       });
     } else {
